@@ -1,0 +1,28 @@
+# .NET Core
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# React / Node
+node_modules/
+dist/
+build/
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+
+# AppSettings secrets
+appsettings.Development.json
+appsettings.Secrets.json
+
+# OS Files
+.DS_Store
+Thumbs.db

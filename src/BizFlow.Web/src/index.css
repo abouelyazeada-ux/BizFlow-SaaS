@@ -1,0 +1,146 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+@layer base {
+  :root {
+    /* Premium SaaS Design Tokens */
+    --background: 0 0% 98.5%;
+    --surface: 0 0% 100%;
+    --surface-elevated: 0 0% 100%;
+    
+    --foreground: 222.2 47% 11%;
+    --foreground-muted: 215.4 16% 47%;
+    
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 242 75% 65%;
+    
+    --primary: 242 75% 65%;
+    --primary-foreground: 210 40% 98%;
+    
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 47% 11%;
+    
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 47% 11%;
+    
+    --success: 142.1 76.2% 36.3%;
+    --success-foreground: 355.7 100% 97.3%;
+    
+    --warning: 38 92% 50%;
+    --warning-foreground: 48 96% 89%;
+    
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47% 11%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47% 11%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 0 0% 4%;
+    --surface: 0 0% 7%;
+    --surface-elevated: 0 0% 9%;
+    
+    --foreground: 210 40% 98%;
+    --foreground-muted: 215 20.2% 65.1%;
+    
+    --border: 0 0% 12%;
+    --input: 0 0% 12%;
+    --ring: 242 75% 65%;
+    
+    --primary: 242 75% 65%;
+    --primary-foreground: 210 40% 98%;
+    
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 210 40% 98%;
+    
+    --accent: 0 0% 12%;
+    --accent-foreground: 210 40% 98%;
+    
+    --success: 142.1 70% 40%;
+    --success-foreground: 144.9 80.4% 10%;
+    
+    --warning: 48 96% 53%;
+    --warning-foreground: 38 92% 10%;
+    
+    --destructive: 0 62.8% 45%;
+    --destructive-foreground: 210 40% 98%;
+
+    --card: 0 0% 7%;
+    --card-foreground: 210 40% 98%;
+    
+    --popover: 0 0% 9%;
+    --popover-foreground: 210 40% 98%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    font-size: var(--text-base);
+    line-height: 1.6;
+  }
+  
+  /* Focus rings for keyboard accessibility */
+  *:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  /* Accessibility min hit targets */
+  button, 
+  [type="button"], 
+  [type="submit"], 
+  input:not([type="checkbox"]):not([type="radio"]), 
+  select, 
+  textarea {
+    min-height: 44px;
+  }
+  
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@theme {
+  --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.8125rem);
+  --text-sm: clamp(0.875rem, 0.85rem + 0.125vw, 0.9375rem); /* 14-15px */
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem); /* 16-18px */
+  --text-lg: clamp(1.125rem, 1.05rem + 0.375vw, 1.25rem); /* 18-20px */
+  --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem); /* 20-24px */
+  --text-2xl: clamp(1.5rem, 1.35rem + 0.75vw, 1.875rem); /* 24-30px */
+  --text-3xl: clamp(1.875rem, 1.65rem + 1.125vw, 2.25rem); /* 30-36px */
+  --text-4xl: clamp(2.25rem, 2rem + 1.25vw, 2.75rem);
+  --text-5xl: clamp(2.75rem, 2.5rem + 1.25vw, 3.5rem);
+}
+
+/* Custom premium utilities */
+@layer utilities {
+  .glass-panel {
+    @apply bg-white/70 dark:bg-[#0A0A0A]/70 backdrop-blur-xl border border-slate-200/50 dark:border-white/[0.06] shadow-sm;
+  }
+  .premium-card {
+    @apply bg-[#0A0A0A]/80 backdrop-blur-xl rounded-[24px] border border-white/[0.08] shadow-2xl transition-all duration-300 hover:border-white/[0.15];
+  }
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-violet-500 dark:from-indigo-400 dark:to-violet-400;
+  }
+}

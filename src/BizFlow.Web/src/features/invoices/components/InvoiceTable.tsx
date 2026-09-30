@@ -1,0 +1,151 @@
+import React from 'react';
+import type { InvoiceDto } from '../../../services/invoiceService';
+import { InvoiceStatusBadge } from './InvoiceStatusBadge';
+import { Eye, Edit2, CheckCircle2, XCircle, Trash2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+interface InvoiceTableProps {
+  data: InvoiceDto[];
+  isLoading: boolean;
+  pageNumber: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  onDelete: (invoice: InvoiceDto) => void;
+  onConfirm: (invoice: InvoiceDto) => void;
+  onCancel: (invoice: InvoiceDto) => void;
+}
+
+export const InvoiceTable: React.FC<InvoiceTableProps> = ({
+  data,
+  isLoading,
+  pageNumber,
+  totalPages,
+  onPageChange,
+  onDelete,
+  onConfirm,
+  onCancel
+}) => {
+  return (
+    <div className="flex flex-col">
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-white/[0.08]">
+          <thead>
+            <tr>
+              <th scope="col" className="py-4 pl-4 pr-3 text-left text-sm font-semibold text-slate-300 sm:pl-6">Invoice #</th>
+              <th scope="col" className="px-3 py-4 text-left text-sm font-semibold text-slate-300">Customer</th>
+              <th scope="col" className="px-3 py-4 text-left text-sm font-semibold text-slate-300">Date</th>
+              <th scope="col" className="px-3 py-4 text-left text-sm font-semibold text-slate-300">Total</th>
+              <th scope="col" className="px-3 py-4 text-left text-sm font-semibold text-slate-300">Status</th>
+              <th scope="col" className="relative py-4 pl-3 pr-4 sm:pr-6"><span className="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-white/[0.05]">
+            {isLoading ? (
+              <tr>
+                <td colSpan={6} className="py-12 text-center">
+                  <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-solid border-primary border-r-transparent align-[-0.125em]" />
+                </td>
+              </tr>
+            ) : data.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="py-12 text-center text-slate-500 text-sm">
+                  No invoices found.
+                </td>
+              </tr>
+            ) : (
+              data.map((invoice) => (
+                <tr key={invoice.id} className="hover:bg-white/[0.02] transition-colors">
+                  <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-6">
+                    {invoice.invoiceNumber}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-400">
+                    {invoice.customerName}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-400">
+                    {new Date(invoice.invoiceDate).toLocaleDateString()}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm font-medium text-white">
+                    ${invoice.total.toFixed(2)}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-400">
+                    <InvoiceStatusBadge status={invoice.status} />
+                  </td>
+                  <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 space-x-3">
+                    <Link to={`/invoices/${invoice.id}`} className="text-indigo-400 hover:text-indigo-300 inline-block transition-colors" title="View Details">
+                      <Eye className="h-4 w-4" />
+                    </Link>
+                    {invoice.status === 'Draft' && (
+                      <>
+                        <Link to={`/invoices/${invoice.id}/edit`} className="text-slate-400 hover:text-white inline-block transition-colors" title="Edit">
+                          <Edit2 className="h-4 w-4" />
+                        </Link>
+                        <button onClick={() => onConfirm(invoice)} className="text-emerald-400 hover:text-emerald-300 inline-block transition-colors" title="Confirm Invoice">
+                          <CheckCircle2 className="h-4 w-4" />
+                        </button>
+                        <button onClick={() => onDelete(invoice)} className="text-rose-400 hover:text-rose-300 inline-block transition-colors" title="Delete Draft">
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </>
+                    )}
+                    {(invoice.status === 'Pending' || invoice.status === 'Draft') && (
+                      <button onClick={() => onCancel(invoice)} className="text-orange-400 hover:text-orange-300 inline-block transition-colors" title="Cancel Invoice">
+                        <XCircle className="h-4 w-4" />
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+      
+      {/* Pagination */}
+      {!isLoading && data.length > 0 && (
+        <div className="flex items-center justify-between border-t border-white/[0.08] px-4 py-4 sm:px-6 mt-2">
+          <div className="flex flex-1 justify-between sm:hidden">
+            <button
+              onClick={() => onPageChange(pageNumber - 1)}
+              disabled={pageNumber === 1}
+              className="relative inline-flex items-center rounded-lg border border-white/[0.1] bg-white/[0.03] px-4 py-2 text-sm font-medium text-slate-300 hover:bg-white/[0.06] disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => onPageChange(pageNumber + 1)}
+              disabled={pageNumber === totalPages}
+              className="relative ml-3 inline-flex items-center rounded-lg border border-white/[0.1] bg-white/[0.03] px-4 py-2 text-sm font-medium text-slate-300 hover:bg-white/[0.06] disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+          <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm text-slate-400">
+                Page <span className="font-medium text-white">{pageNumber}</span> of <span className="font-medium text-white">{totalPages || 1}</span>
+              </p>
+            </div>
+            <div>
+              <nav className="isolate inline-flex -space-x-px rounded-lg shadow-sm" aria-label="Pagination">
+                <button
+                  onClick={() => onPageChange(pageNumber - 1)}
+                  disabled={pageNumber === 1}
+                  className="relative inline-flex items-center rounded-l-lg px-3 py-2 text-slate-400 border border-white/[0.1] hover:bg-white/[0.05] focus:z-20 disabled:opacity-50 text-sm"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => onPageChange(pageNumber + 1)}
+                  disabled={pageNumber === totalPages || totalPages === 0}
+                  className="relative inline-flex items-center rounded-r-lg px-3 py-2 text-slate-400 border border-white/[0.1] border-l-0 hover:bg-white/[0.05] focus:z-20 disabled:opacity-50 text-sm"
+                >
+                  Next
+                </button>
+              </nav>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

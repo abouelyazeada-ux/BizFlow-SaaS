@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/BizFlow.API/BizFlow.API.csproj" />
+    <Project Path="src/BizFlow.Application/BizFlow.Application.csproj" />
+    <Project Path="src/BizFlow.Domain/BizFlow.Domain.csproj" />
+    <Project Path="src/BizFlow.Infrastructure/BizFlow.Infrastructure.csproj" />
+  </Folder>
+</Solution>

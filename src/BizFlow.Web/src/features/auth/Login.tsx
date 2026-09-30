@@ -1,0 +1,109 @@
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../stores/authStore';
+import { authService, type LoginRequest } from '../../services/authService';
+import { Loader2 } from 'lucide-react';
+
+const loginSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+export const Login = () => {
+  const navigate = useNavigate();
+  const setAuth = useAuthStore((state) => state.setAuth);
+  const [error, setError] = useState<string | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginRequest>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const onSubmit = async (data: LoginRequest) => {
+    console.log('LOGIN PAGE: 1. login submit started');
+    setError(null);
+    try {
+      const response = await authService.login(data);
+      console.log('LOGIN PAGE: 2. login API response status', 200);
+      console.log('LOGIN PAGE: 3. login API response body', response);
+      console.log('LOGIN PAGE: 4. setAuth() called');
+      setAuth(response);
+      console.log('LOGIN PAGE: 5. Zustand state immediately after setAuth()', useAuthStore.getState());
+      console.log('LOGIN PAGE: 6. localStorage auth-storage immediately after setAuth()', localStorage.getItem('auth-storage'));
+      console.log('LOGIN PAGE: 7. navigate() target', '/');
+      console.log('STEP 8: expiration value', response.expiration);
+      console.log('STEP 8: new Date(expiration)', new Date(response.expiration));
+      console.log('STEP 8: new Date()', new Date());
+      navigate('/');
+    } catch (err: any) {
+      if (err.response?.status === 401) {
+        setError('Invalid email or password');
+      } else {
+        setError(err.response?.data?.message || 'An error occurred during login');
+      }
+    }
+  };
+
+  return (
+    <div className="w-full">
+      <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-5 py-4 rounded-xl text-[16px]" role="alert">
+            {error}
+          </div>
+        )}
+
+        <div className="space-y-2.5">
+          <label className="block text-[15px] font-medium text-slate-200">Email address</label>
+          <input
+            type="email"
+            {...register('email')}
+            className="appearance-none block w-full h-[52px] xl:h-[56px] px-4 border border-slate-300 rounded-[12px] shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-[16px] transition-colors"
+            aria-invalid={!!errors.email}
+          />
+          {errors.email && (
+            <p className="text-[14px] text-red-400 mt-1.5">{errors.email.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2.5">
+          <label className="block text-[15px] font-medium text-slate-200">Password</label>
+          <input
+            type="password"
+            {...register('password')}
+            className="appearance-none block w-full h-[52px] xl:h-[56px] px-4 border border-slate-300 rounded-[12px] shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-[16px] transition-colors"
+            aria-invalid={!!errors.password}
+          />
+          {errors.password && (
+            <p className="text-[14px] text-red-400 mt-1.5">{errors.password.message}</p>
+          )}
+        </div>
+
+        <div className="pt-4">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full flex justify-center items-center h-[52px] xl:h-[56px] px-6 border border-transparent rounded-[12px] shadow-sm text-[16px] font-semibold text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500 disabled:opacity-50 transition-colors"
+          >
+            {isSubmitting ? <Loader2 className="h-6 w-6 animate-spin" /> : 'Sign in'}
+          </button>
+        </div>
+      </form>
+
+      <div className="mt-8 text-center">
+        <p className="text-[15px] text-slate-400">
+          Don't have an account?{' '}
+          <Link to="/register" className="font-semibold text-indigo-400 hover:text-indigo-300 transition-colors rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] px-2 py-1">
+            Create a workspace
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+};
